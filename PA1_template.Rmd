@@ -1,91 +1,91 @@
 ---
-output:
+title: "Reproducible Research: Peer Assessment 1"
+output: 
   html_document:
-    keep_md: yes
+    keep_md: true
 ---
-# Reproducible Research: Peer Assessment 1
 
-## Load the required packages
+## Load the required packages  
 ``` {r loadPackages, echo=TRUE}
         library(ggplot2)
         library(lubridate)
-        library(dplyr)        
+        library(dplyr)          
 ```
 
-## Loading and preprocessing the data
-1. Load the data
+## Loading and preprocessing the data  
+1. Load the data  
 ``` {r, echo=TRUE} 
         file = unzip('activity.zip', 'activity.csv')
-        activity <- read.csv(file, stringsAsFactors = F)
+        activity <- read.csv(file, stringsAsFactors = F)  
 ```
-2. Process/transform the data (if necessary) into a format suitable for your analysis
+2. Process/transform the data (if necessary) into a format suitable for your analysis  
 ``` {r, echo=TRUE} 
         activity$date <- ymd(activity$date)
-        activity$day <- day(activity$date)
+        activity$day <- day(activity$date)  
 ```
-## What is mean total number of steps taken per day?
-1. Calculate the total number of steps taken per day
+## What is mean total number of steps taken per day?  
+1. Calculate the total number of steps taken per day  
 ```{r meanSteps, echo=TRUE}
-        StepsPerDay <- activity %>% group_by(day) %>% summarise(totalSteps = sum(steps, na.rm = T))       
+        StepsPerDay <- activity %>% group_by(day) %>% summarise(totalSteps = sum(steps, na.rm = T))         
 ```
-2. Histogram of the total number of steps taken each day  
+2. Histogram of the total number of steps taken each day    
 ```{r, echo=TRUE, fig.align='center'}
-        ggplot(StepsPerDay, aes(x = factor(day), y = totalSteps)) + geom_histogram(stat = 'identity') + labs(title = 'Total Steps per Day') + labs (x = 'Day of Month', y = 'Total Steps')
+        ggplot(StepsPerDay, aes(x = factor(day), y = totalSteps)) + geom_histogram(stat = 'identity') + labs(title = 'Total Steps per Day') + labs (x = 'Day of Month', y = 'Total Steps')  
 ```  
-3. Mean and Median of Total number of Steps taken each day  
+3. Mean and Median of Total number of Steps taken each day    
 ```{r, echo=TRUE}
         SummarySteps <- activity %>% group_by(day) %>% summarise(meanSteps = mean(steps, na.rm = T), medianSteps = median(steps, na.rm = T))
-        SummarySteps        
+        SummarySteps          
 ```
-## What is the average daily activity pattern?  
-1. Time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+## What is the average daily activity pattern?    
+1. Time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)  
 ```{r, echo=TRUE, fig.align='center'}
         TimeSeries <- activity %>% group_by(day) %>% group_by(interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
-        ggplot(TimeSeries, aes(x = interval, y = meanSteps)) + geom_line() + labs(title = 'Average Steps Per 5 min Interval Across All Days') + labs(x = '5 min Interval', y = 'Avg Steps')
+        ggplot(TimeSeries, aes(x = interval, y = meanSteps)) + geom_line() + labs(title = 'Average Steps Per 5 min Interval Across All Days') + labs(x = '5 min Interval', y = 'Avg Steps')  
 ```
-2. Time interval with maximum number of steps across all days
+2. Time interval with maximum number of steps across all days  
 ```{r, echo=TRUE}
         TimeSeries[which.max(TimeSeries$meanSteps),][1]
 ```
-## Imputing missing values
-1. Total number of rows with NA's or missing values
+## Imputing missing values  
+1. Total number of rows with NA's or missing values  
 ``` {r, echo=TRUE}
-        sum(is.na(activity))
+        sum(is.na(activity))  
 ```
-2. Devise a strategy to fill in the missing values
+2. Devise a strategy to fill in the missing values  
 ```{r, echo=TRUE}
         MeanStepsPerInterval <- activity %>% group_by(interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
         ConsolidatedActivity <- merge(activity, MeanStepsPerInterval, by = 'interval')
         missing <- is.na(ConsolidatedActivity$steps)
-        ConsolidatedActivity[missing, 'steps'] <- ConsolidatedActivity[missing, 'meanSteps']
+        ConsolidatedActivity[missing, 'steps'] <- ConsolidatedActivity[missing, 'meanSteps']  
 ```
-3. New dataset with the missing values filled
+3. New dataset with the missing values filled  
 ```{r, echo=TRUE}
         ConsolidatedActivity <- ConsolidatedActivity %>% select(c(1,2,3,4)) %>% arrange(date)
-        ConsolidatedActivity$steps <- round(ConsolidatedActivity$steps, 2)
+        ConsolidatedActivity$steps <- round(ConsolidatedActivity$steps, 2)  
 ```
-4. Histogram of total number of steps taken each day
+4. Histogram of total number of steps taken each day  
 ```{r, echo=TRUE, fig.align='center'}
         ConsolidatedStepsPerDay <- ConsolidatedActivity %>% group_by(day) %>% summarise(totalSteps = sum(steps, na.rm = T)) 
-        ggplot(ConsolidatedStepsPerDay, aes(x = factor(day), y = totalSteps)) + geom_histogram(stat = 'identity') + labs(title = 'Total Steps per Day') + labs (x = 'Day of Month', y = 'Total Steps')
+        ggplot(ConsolidatedStepsPerDay, aes(x = factor(day), y = totalSteps)) + geom_histogram(stat = 'identity') + labs(title = 'Total Steps per Day') + labs (x = 'Day of Month', y = 'Total Steps')  
 ```
-**The values differ from the estimates in the first part. The plot below shows the differences between the two estimates. Red plot is for data with missing values. Black plot is for data with imputed values**
+**The values differ from the estimates in the first part. The plot below shows the differences between the two estimates. Red plot is for data with missing values. Black plot is for data with imputed values**  
 ```{r, echo=TRUE, fig.align='center'}
         CompareStepsPerDay <- as.data.frame(cbind(activity$day, activity$steps, ConsolidatedActivity$steps))
         colnames(CompareStepsPerDay) <- c('day', 'steps', 'stepsnomissing')
         CompareTotalStepsPerDay <- CompareStepsPerDay %>% group_by(day) %>% summarise(steps = sum(steps, na.rm = T), stepsnomissing = sum(stepsnomissing, na.rm = T)) 
-        ggplot(CompareTotalStepsPerDay) + geom_line(aes(x = day, y = steps), colour = 'RED') + geom_line(aes(x = day, y = stepsnomissing))
+        ggplot(CompareTotalStepsPerDay) + geom_line(aes(x = day, y = steps), colour = 'RED') + geom_line(aes(x = day, y = stepsnomissing))  
 ```
-## Are there differences in activity patterns between weekdays and weekends?  
-1. Create a factor variable to indicate weekday or weekend
+## Are there differences in activity patterns between weekdays and weekends?    
+1. Create a factor variable to indicate weekday or weekend  
 ```{r, echo=TRUE} 
         ConsolidatedActivity$wday <- wday(ConsolidatedActivity$date)
         ConsolidatedActivity$wday <- ifelse(ConsolidatedActivity$wday %in% 2:6, 'weekday', 'weekend')
-        ConsolidatedActivity$wday <- as.factor(ConsolidatedActivity$wday)
+        ConsolidatedActivity$wday <- as.factor(ConsolidatedActivity$wday)  
 ```
-2. Panel plot containing the time series plot of the 5-minute interval and average number of steps taken across all weekdays and weekends  
+2. Panel plot containing the time series plot of the 5-minute interval and average number of steps taken across all weekdays and weekends    
 ``` {r, echo=TRUE, fig.align='center'}
        ConsolidatedActivityWday <-  ConsolidatedActivity %>% group_by(wday, interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
-     ggplot(ConsolidatedActivityWday, aes(x = interval, y = meanSteps)) + facet_grid(wday ~ .) + geom_line() + labs(title = 'Average Steps Per 5 min Interval Across Weekdays and Weekends') + labs(x = '5 min Interval', y = 'Avg Steps')   
+     ggplot(ConsolidatedActivityWday, aes(x = interval, y = meanSteps)) + facet_grid(wday ~ .) + geom_line() + labs(title = 'Average Steps Per 5 min Interval Across Weekdays and Weekends') + labs(x = '5 min Interval', y = 'Avg Steps')     
 ```
-**End**
+**End**  
