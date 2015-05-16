@@ -32,6 +32,7 @@ output:
 ```{r, echo=TRUE, fig.align='center'}
         ggplot(StepsPerDay, aes(x = factor(day), y = totalSteps)) + geom_histogram(stat = 'identity') + labs(title = 'Total Steps per Day') + labs (x = 'Day of Month', y = 'Total Steps')  
 ```  
+
 3. Mean and Median of Total number of Steps taken each day    
 ```{r, echo=TRUE}
         SummarySteps <- activity %>% group_by(day) %>% summarise(meanSteps = mean(steps, na.rm = T), medianSteps = median(steps, na.rm = T))
@@ -42,7 +43,8 @@ output:
 ```{r, echo=TRUE, fig.align='center'}
         TimeSeries <- activity %>% group_by(day) %>% group_by(interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
         ggplot(TimeSeries, aes(x = interval, y = meanSteps)) + geom_line() + labs(title = 'Average Steps Per 5 min Interval Across All Days') + labs(x = '5 min Interval', y = 'Avg Steps')  
-```
+```  
+
 2. Time interval with maximum number of steps across all days  
 ```{r, echo=TRUE}
         TimeSeries[which.max(TimeSeries$meanSteps),][1]
@@ -68,24 +70,28 @@ output:
 ```{r, echo=TRUE, fig.align='center'}
         ConsolidatedStepsPerDay <- ConsolidatedActivity %>% group_by(day) %>% summarise(totalSteps = sum(steps, na.rm = T)) 
         ggplot(ConsolidatedStepsPerDay, aes(x = factor(day), y = totalSteps)) + geom_histogram(stat = 'identity') + labs(title = 'Total Steps per Day') + labs (x = 'Day of Month', y = 'Total Steps')  
-```
+```  
+
 **The values differ from the estimates in the first part. The plot below shows the differences between the two estimates. Red plot is for data with missing values. Black plot is for data with imputed values**  
 ```{r, echo=TRUE, fig.align='center'}
         CompareStepsPerDay <- as.data.frame(cbind(activity$day, activity$steps, ConsolidatedActivity$steps))
         colnames(CompareStepsPerDay) <- c('day', 'steps', 'stepsnomissing')
         CompareTotalStepsPerDay <- CompareStepsPerDay %>% group_by(day) %>% summarise(steps = sum(steps, na.rm = T), stepsnomissing = sum(stepsnomissing, na.rm = T)) 
         ggplot(CompareTotalStepsPerDay) + geom_line(aes(x = day, y = steps), colour = 'RED') + geom_line(aes(x = day, y = stepsnomissing))  
-```
+```  
+
 ## Are there differences in activity patterns between weekdays and weekends?    
 1. Create a factor variable to indicate weekday or weekend  
 ```{r, echo=TRUE} 
         ConsolidatedActivity$wday <- wday(ConsolidatedActivity$date)
         ConsolidatedActivity$wday <- ifelse(ConsolidatedActivity$wday %in% 2:6, 'weekday', 'weekend')
         ConsolidatedActivity$wday <- as.factor(ConsolidatedActivity$wday)  
-```
+```  
+
 2. Panel plot containing the time series plot of the 5-minute interval and average number of steps taken across all weekdays and weekends    
 ``` {r, echo=TRUE, fig.align='center'}
        ConsolidatedActivityWday <-  ConsolidatedActivity %>% group_by(wday, interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
      ggplot(ConsolidatedActivityWday, aes(x = interval, y = meanSteps)) + facet_grid(wday ~ .) + geom_line() + labs(title = 'Average Steps Per 5 min Interval Across Weekdays and Weekends') + labs(x = '5 min Interval', y = 'Avg Steps')     
-```
+```  
+
 **End**  

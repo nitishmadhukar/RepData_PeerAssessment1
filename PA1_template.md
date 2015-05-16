@@ -51,6 +51,7 @@
 ```
 
 <img src="PA1_template_files/figure-html/unnamed-chunk-3-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 3. Mean and Median of Total number of Steps taken each day    
 
 ```r
@@ -83,6 +84,7 @@
 ```
 
 <img src="PA1_template_files/figure-html/unnamed-chunk-5-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 2. Time interval with maximum number of steps across all days  
 
 ```r
@@ -127,6 +129,7 @@
 ```
 
 <img src="PA1_template_files/figure-html/unnamed-chunk-10-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 **The values differ from the estimates in the first part. The plot below shows the differences between the two estimates. Red plot is for data with missing values. Black plot is for data with imputed values**  
 
 ```r
@@ -137,6 +140,7 @@
 ```
 
 <img src="PA1_template_files/figure-html/unnamed-chunk-11-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 ## Are there differences in activity patterns between weekdays and weekends?    
 1. Create a factor variable to indicate weekday or weekend  
 
@@ -145,6 +149,7 @@
         ConsolidatedActivity$wday <- ifelse(ConsolidatedActivity$wday %in% 2:6, 'weekday', 'weekend')
         ConsolidatedActivity$wday <- as.factor(ConsolidatedActivity$wday)  
 ```
+
 2. Panel plot containing the time series plot of the 5-minute interval and average number of steps taken across all weekdays and weekends    
 
 ```r
@@ -153,4 +158,5 @@
 ```
 
 <img src="PA1_template_files/figure-html/unnamed-chunk-13-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 **End**  
