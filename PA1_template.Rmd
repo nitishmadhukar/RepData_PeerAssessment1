@@ -31,30 +31,37 @@ output:
 2. Histogram of the total number of steps taken each day    
 ```{r, echo=TRUE, fig.align='center'}
         ggplot(StepsPerDay, aes(x = factor(day), y = totalSteps)) + geom_histogram(stat = 'identity') + labs(title = 'Total Steps per Day') + labs (x = 'Day of Month', y = 'Total Steps')  
-```  
+```   
 
 3. Mean and Median of Total number of Steps taken each day    
 ```{r, echo=TRUE}
         SummarySteps <- activity %>% group_by(day) %>% summarise(meanSteps = mean(steps, na.rm = T), medianSteps = median(steps, na.rm = T))
-        SummarySteps          
-```
+        meansteps <- SummarySteps$meanSteps
+        mediansteps <- SummarySteps$medianSteps
+```    
+The mean steps taken each day are `r meansteps`.    
+The median steps taken each day are `r mediansteps`.      
+
 ## What is the average daily activity pattern?    
 1. Time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)  
 ```{r, echo=TRUE, fig.align='center'}
         TimeSeries <- activity %>% group_by(day) %>% group_by(interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
         ggplot(TimeSeries, aes(x = interval, y = meanSteps)) + geom_line() + labs(title = 'Average Steps Per 5 min Interval Across All Days') + labs(x = '5 min Interval', y = 'Avg Steps')  
-```  
+```    
 
 2. Time interval with maximum number of steps across all days  
 ```{r, echo=TRUE}
-        TimeSeries[which.max(TimeSeries$meanSteps),][1]
-```
+        timeinterval <- TimeSeries[which.max(TimeSeries$meanSteps),][1]
+```  
+The 5-minute time interval that contains the maximum number of steps is `r timeinterval`.     
+
 ## Imputing missing values  
 1. Total number of rows with NA's or missing values  
 ``` {r, echo=TRUE}
         sum(is.na(activity))  
 ```
 2. Devise a strategy to fill in the missing values  
+**The strategy applied here is to impute the missing values with the average steps for the respective 5-minute time interval**    
 ```{r, echo=TRUE}
         MeanStepsPerInterval <- activity %>% group_by(interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
         ConsolidatedActivity <- merge(activity, MeanStepsPerInterval, by = 'interval')
@@ -86,8 +93,7 @@ output:
         ConsolidatedActivity$wday <- wday(ConsolidatedActivity$date)
         ConsolidatedActivity$wday <- ifelse(ConsolidatedActivity$wday %in% 2:6, 'weekday', 'weekend')
         ConsolidatedActivity$wday <- as.factor(ConsolidatedActivity$wday)  
-```  
-
+```   
 2. Panel plot containing the time series plot of the 5-minute interval and average number of steps taken across all weekdays and weekends    
 ``` {r, echo=TRUE, fig.align='center'}
        ConsolidatedActivityWday <-  ConsolidatedActivity %>% group_by(wday, interval) %>% summarise(meanSteps = mean(steps, na.rm = T))

@@ -56,25 +56,12 @@
 
 ```r
         SummarySteps <- activity %>% group_by(day) %>% summarise(meanSteps = mean(steps, na.rm = T), medianSteps = median(steps, na.rm = T))
-        SummarySteps          
+        meansteps <- SummarySteps$meanSteps
+        mediansteps <- SummarySteps$medianSteps
 ```
+The mean steps taken each day are NA, 18.6215278, 38.0607639, 42.0694444, 41.203125, 41.2395833, 41.4895833, 11.1770833, 44.4826389, 34.375, 39.7777778, 48.8663194, 34.3090278, 52.4236111, 17.6736111, 35.6336806, 48.2482639, 43.6909722, 35.8854167, 25.8107639, 37.5138889, 58.8315972, 52.2777778, 39.640625, 24.8715278, 31.1458333, 41.2586806, 37.5711806, 20.9461806, 34.09375, 53.5208333.    
+The median steps taken each day are NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.      
 
-```
-## Source: local data frame [31 x 3]
-## 
-##    day meanSteps medianSteps
-## 1    1        NA          NA
-## 2    2  18.62153           0
-## 3    3  38.06076           0
-## 4    4  42.06944           0
-## 5    5  41.20312           0
-## 6    6  41.23958           0
-## 7    7  41.48958           0
-## 8    8  11.17708           0
-## 9    9  44.48264           0
-## 10  10  34.37500           0
-## .. ...       ...         ...
-```
 ## What is the average daily activity pattern?    
 1. Time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)  
 
@@ -88,15 +75,10 @@
 2. Time interval with maximum number of steps across all days  
 
 ```r
-        TimeSeries[which.max(TimeSeries$meanSteps),][1]
+        timeinterval <- TimeSeries[which.max(TimeSeries$meanSteps),][1]
 ```
+The 5-minute time interval that contains the maximum number of steps is 835.     
 
-```
-## Source: local data frame [1 x 1]
-## 
-##   interval
-## 1      835
-```
 ## Imputing missing values  
 1. Total number of rows with NA's or missing values  
 
@@ -108,6 +90,7 @@
 ## [1] 2304
 ```
 2. Devise a strategy to fill in the missing values  
+**The strategy applied here is to impute the missing values with the average steps for the respective 5-minute time interval**    
 
 ```r
         MeanStepsPerInterval <- activity %>% group_by(interval) %>% summarise(meanSteps = mean(steps, na.rm = T))
@@ -149,7 +132,6 @@
         ConsolidatedActivity$wday <- ifelse(ConsolidatedActivity$wday %in% 2:6, 'weekday', 'weekend')
         ConsolidatedActivity$wday <- as.factor(ConsolidatedActivity$wday)  
 ```
-
 2. Panel plot containing the time series plot of the 5-minute interval and average number of steps taken across all weekdays and weekends    
 
 ```r
